@@ -1,4 +1,4 @@
-# Portfolio
+# My Portfolio
 
 Single-page portfolio built with vanilla HTML/CSS/JS.
 
@@ -12,16 +12,9 @@ Single-page portfolio built with vanilla HTML/CSS/JS.
 ## Run locally
 
 This is a static site. For best results, use a local server.
-
-```powershell
-python -m http.server 5500
-```
-
 Open `http://localhost:5500/`.
 
-
 ## Structure
-
 - `index.html`
 - `css/`
 - `js/`
