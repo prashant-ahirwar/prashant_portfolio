@@ -1,0 +1,66 @@
+#projects .cards{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 980px){
+  #projects .cards{
+    grid-template-columns: 1fr;
+  }
+}
+
+.project-card{
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card .top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.project-title{
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.project-tag{
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.mock{
+  margin-top: 14px;
+  border-radius: calc(var(--radius) + 8px);
+  border: 1px solid rgba(248, 250, 252, 0.12);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.mock img{
+  width: 100%;
+  height: auto;
+}
+
+.project-badges{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.badge{
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 252, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 250, 252, 0.86);
+  font-size: 0.9rem;
+}
+.badge.danger{
+  border-color: rgba(244, 63, 94, 0.35);
+  background: rgba(244, 63, 94, 0.12);
+}
