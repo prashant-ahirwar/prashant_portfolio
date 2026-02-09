@@ -14,7 +14,7 @@ export function initParticleNameCanvas(){
 
   const config = {
     text: 'PRASHANT',
-    font: '700 128px "Space Grotesk", system-ui, sans-serif',
+    font: '800 128px "Space Grotesk", system-ui, sans-serif',
     dotSize: 2.2,
     gap: 6,
     scatterRadius: 70,
@@ -23,7 +23,60 @@ export function initParticleNameCanvas(){
   };
 
   let points = [];
-  let mouse = {x: -9999, y: -9999, moving: false, t: 0};
+  let pointer = {x: -9999, y: -9999, moving: false, t: 0};
+  let ro;
+
+  function setPointer(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = clientX - rect.left;
+    pointer.y = clientY - rect.top;
+    pointer.moving = true;
+    pointer.t = performance.now();
+  }
+
+  function clearPointer(){
+    pointer.moving = false;
+    pointer.x = -9999;
+    pointer.y = -9999;
+  }
+
+  function fitFontSize(){
+    // Find the largest font that fits within the canvas on one line.
+    // Adds padding so it doesn't touch rounded borders.
+    const padX = Math.max(18, Math.floor(w * 0.04));
+    const maxWidth = Math.max(0, w - padX * 2);
+    const maxHeight = Math.max(0, h * 0.72);
+
+    const off = document.createElement('canvas');
+    off.width = Math.max(1, w);
+    off.height = Math.max(1, h);
+    const o = off.getContext('2d');
+    o.textAlign = 'center';
+    o.textBaseline = 'middle';
+
+    let lo = 28;
+    let hi = 240;
+    let best = 96;
+
+    for(let i = 0; i < 14; i++){
+      const mid = Math.floor((lo + hi) / 2);
+      o.font = `800 ${mid}px "Space Grotesk", system-ui, sans-serif`;
+      const m = o.measureText(config.text);
+      // Approx height: use em box when available, otherwise estimate.
+      const hBox = (m.actualBoundingBoxAscent && m.actualBoundingBoxDescent)
+        ? (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
+        : (mid * 1.05);
+
+      if(m.width <= maxWidth && hBox <= maxHeight){
+        best = mid;
+        lo = mid + 1;
+      }else{
+        hi = mid - 1;
+      }
+    }
+
+    return clamp(best, 42, 220);
+  }
 
   function resize(){
     const rect = canvas.getBoundingClientRect();
@@ -32,6 +85,14 @@ export function initParticleNameCanvas(){
     canvas.width = Math.floor(w * DPR);
     canvas.height = Math.floor(h * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    const fontSize = Math.floor(fitFontSize());
+    const isSmall = w < 420;
+    config.font = `800 ${fontSize}px "Space Grotesk", system-ui, sans-serif`;
+    config.gap = isSmall ? 7 : 6;
+    config.dotSize = isSmall ? 2.05 : 2.4;
+    config.scatterRadius = Math.floor(clamp(Math.min(w, h) * 0.22, 70, 140));
+
     buildPoints();
   }
 
@@ -82,11 +143,11 @@ export function initParticleNameCanvas(){
     ctx.fillRect(0,0,w,h);
 
     for(const p of points){
-      const dx = p.x - mouse.x;
-      const dy = p.y - mouse.y;
+      const dx = p.x - pointer.x;
+      const dy = p.y - pointer.y;
       const dist = Math.hypot(dx, dy);
 
-      if(mouse.moving && dist < config.scatterRadius){
+      if(pointer.moving && dist < config.scatterRadius){
         const force = (1 - dist / config.scatterRadius);
         p.vx += (dx / (dist || 1)) * force * 6;
         p.vy += (dy / (dist || 1)) * force * 6;
@@ -110,26 +171,33 @@ export function initParticleNameCanvas(){
     requestAnimationFrame(draw);
   }
 
-  function onMove(e){
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-    mouse.moving = true;
-    mouse.t = performance.now();
+  function onPointerMove(e){
+    setPointer(e.clientX, e.clientY);
+  }
+
+  function onTouchMove(e){
+    const t = e.touches && e.touches[0];
+    if(!t) return;
+    setPointer(t.clientX, t.clientY);
   }
 
   function tickMouse(){
-    if(mouse.moving && performance.now() - mouse.t > 120){
-      mouse.moving = false;
-      mouse.x = -9999;
-      mouse.y = -9999;
+    if(pointer.moving && performance.now() - pointer.t > 120){
+      clearPointer();
     }
     requestAnimationFrame(tickMouse);
   }
 
   window.addEventListener('resize', resize);
-  canvas.addEventListener('mousemove', onMove, {passive:true});
-  canvas.addEventListener('mouseleave', () => { mouse.moving = false; mouse.x = -9999; mouse.y = -9999; });
+  canvas.addEventListener('pointermove', onPointerMove, { passive: true });
+  canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+  canvas.addEventListener('pointerleave', clearPointer, { passive: true });
+  canvas.addEventListener('touchend', clearPointer, { passive: true });
+
+  if('ResizeObserver' in window){
+    ro = new ResizeObserver(() => resize());
+    ro.observe(canvas);
+  }
 
   resize();
   tickMouse();

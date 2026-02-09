@@ -1,15 +1,12 @@
 #contact .contact-wrap{
   position: relative;
+  overflow: hidden;
 }
 
 .contact-blob{
   position: absolute;
   inset: -120px -90px;
   z-index: -1;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(124, 58, 237, 0.65), transparent 55%),
-    radial-gradient(circle at 60% 40%, rgba(34, 197, 94, 0.45), transparent 55%),
-    radial-gradient(circle at 40% 75%, rgba(244, 114, 182, 0.5), transparent 55%);
   filter: blur(38px);
   opacity: 0.75;
   animation: blobMove 12s ease-in-out infinite alternate;

@@ -3,9 +3,17 @@
 }
 
 #particle-name{
+  display: block;
   width: 100%;
-  height: 360px;
+  height: clamp(260px, 42vw, 520px);
   border-radius: calc(var(--radius) + 10px);
   border: 1px solid rgba(248, 250, 252, 0.14);
   background: rgba(15, 23, 42, 0.55);
+  touch-action: none;
+}
+
+@media (max-width: 520px){
+  #fun .fun-card{
+    padding: 14px;
+  }
 }

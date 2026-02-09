@@ -11,6 +11,7 @@ import { initParticlesBackground, initParticleNameCanvas } from './particles.js'
 import { initSkillFloatingIcons } from './skills.js';
 import { initTaglineWords, initTimelineLineStyle, initProjectToggles } from './dom.js';
 import { initContactForm } from './form.js';
+import { initMobileNav } from './nav.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initTaglineWords();
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticlesBackground();
 
   initNavbarAnimations();
+  initMobileNav();
   initHeroAnimations();
   initCTAButtonParticles();
 

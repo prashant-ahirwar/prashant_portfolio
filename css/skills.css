@@ -87,6 +87,7 @@
   border-radius: calc(var(--radius) + 10px);
   background: #ede8d0;
   overflow: hidden;
+  touch-action: none;
 }
 
 .skill-icon{
@@ -118,11 +119,32 @@
   .skills-board{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .skills-wrapper{
+    gap: 22px;
+  }
+
+  .skill-cell{
+    min-height: 70px;
+    border-radius: 14px;
+  }
 }
 
 @media (max-width: 520px){
   .skill-icon{
     width: 52px;
     height: 52px;
+  }
+
+  .skills-board{
+    gap: 8px;
+  }
+
+  .skill-cell span{
+    font-size: 11px;
+  }
+
+  .skill-float-container{
+    height: 340px;
   }
 }
