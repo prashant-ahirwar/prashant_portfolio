@@ -19,23 +19,34 @@ export function initContactForm(){
     input.addEventListener('blur', () => updateFilled(f));
   });
 
-  async function sendWithEmailJS(){
-    const emailjs = window.emailjs;
-    if(!emailjs?.sendForm) return {ok: false, reason: 'emailjs_missing'};
+  async function sendViaBackend(){
+    const endpoint = form.getAttribute('data-backend-url') || 'http://localhost:5000/send-email';
 
-    const serviceId = form.getAttribute('data-emailjs-service');
-    const templateId = form.getAttribute('data-emailjs-template');
-    const publicKey = form.getAttribute('data-emailjs-public');
+    const payload = {
+      name: (form.elements?.namedItem?.('name')?.value || '').trim(),
+      email: (form.elements?.namedItem?.('email')?.value || '').trim(),
+      message: (form.elements?.namedItem?.('message')?.value || '').trim(),
+    };
 
-  if(!serviceId || !templateId || !publicKey) return {ok: false, reason: 'emailjs_unconfigured'};
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
 
-    emailjs?.init?.(publicKey);
+    let data;
     try{
-      await emailjs.sendForm(serviceId, templateId, form);
-      return {ok: true};
-    }catch(err){
-      return {ok: false, reason: 'emailjs_error', err};
+      data = await res.json();
+    }catch{
+      data = null;
     }
+
+    if(res.ok && data?.success) return {ok: true};
+
+    const errMsg = data?.error || `http_${res.status}`;
+    return {ok: false, reason: 'backend_error', err: errMsg};
   }
 
   form.addEventListener('submit', async (e) => {
@@ -62,7 +73,7 @@ export function initContactForm(){
     btn?.setAttribute('disabled', 'disabled');
     btn.textContent = 'Sending…';
 
-    const result = await sendWithEmailJS();
+    const result = await sendViaBackend();
 
     if(result.ok){
       btn.textContent = 'Sent ✨';
@@ -75,20 +86,9 @@ export function initContactForm(){
       return;
     }
 
-    if(result.reason === 'emailjs_unconfigured' || result.reason === 'emailjs_missing'){
-      btn.textContent = 'Sent ✨';
-      setTimeout(() => {
-        btn?.removeAttribute('disabled');
-        btn.textContent = originalText;
-        form.reset();
-        fields.forEach(updateFilled);
-      }, 1200);
-      return;
-    }
-
     console.error(result.err);
     btn?.removeAttribute('disabled');
-    btn.textContent = 'Failed — check EmailJS IDs';
+    btn.textContent = 'Failed — try again';
     setTimeout(() => {
       btn.textContent = originalText;
     }, 1800);
