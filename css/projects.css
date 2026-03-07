@@ -14,6 +14,11 @@
   padding: 18px;
   position: relative;
   overflow: hidden;
+
+  /* Keep cards visually consistent in the grid */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .project-card .top{
@@ -35,6 +40,12 @@
 .project-tag{
   font-size: 0.9rem;
   color: var(--muted);
+
+  /* Prevent long subtitles from making some cards taller */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .mock{
@@ -43,11 +54,20 @@
   border: 1px solid rgba(248, 250, 252, 0.12);
   overflow: hidden;
   background: rgba(0, 0, 0, 0.25);
+
+  /* Match screenshot region height across cards */
+  aspect-ratio: 16 / 9;
+  display: flex;
+
+  /* Make sure the image region never collapses, preventing overlap */
+  min-height: 180px;
 }
 
 .mock img{
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .project-badges{
